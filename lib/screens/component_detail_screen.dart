@@ -26,7 +26,6 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     with TickerProviderStateMixin {
   GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
   // final assetsAudioPlayer = AssetsAudioPlayer();
-  final player = AudioPlayer();
   double _setVolumeValue = 0;
   int rounds = 5;
   int initRounds = 5;
@@ -60,11 +59,7 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     breakingDuration =
         Duration(minutes: SavingDataLocally.getBreakingDuration());
     rounds = SavingDataLocally.getRounds();
-    // assetsAudioPlayer.open(
-    //   Audio('assets/sounds/end_out.mp3'),
-    //   autoStart: false,
-    // );
-    player.setAsset('assets/sounds/end_out.mp3');
+
     super.initState();
   }
 
@@ -143,7 +138,6 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
       if (seconds < 0) {
         learningTimer?.cancel();
         // assetsAudioPlayer.play();
-        player.play();
         isBreakingCompleted = !isBreakingCompleted;
         isLearningCompleted = !isLearningCompleted;
         startBreak();
@@ -255,7 +249,6 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     videoController!.dispose();
     VolumeController().removeListener();
     roundsController.dispose();
-    player.dispose();
     super.dispose();
   }
 

@@ -6,6 +6,7 @@ import 'package:pomodoro/screens/favorite_screen.dart';
 import 'package:pomodoro/screens/homepage_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:pomodoro/screens/tasks_screen.dart';
 import 'package:pomodoro/screens/time_manager_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -20,7 +21,7 @@ class TabsScreen extends StatefulWidget {
 
 class _TabsScreenState extends State<TabsScreen> {
   List<Map<String, dynamic>>? _pages;
-  int _selectedPageIndex = 2;
+  int _selectedPageIndex = 0;
   final Connectivity _connectivity = Connectivity();
   StreamSubscription? internetconnection;
   @override
@@ -48,7 +49,7 @@ class _TabsScreenState extends State<TabsScreen> {
         'page': FavoriteScreen(),
         'title': 'Your Favorite',
       },
-      {'page': TimeManagerScreen(), 'title': 'Time Mangement'}
+      {'page': TasksScreen(), 'title': 'Tasks'}
     ];
     super.initState();
   }
@@ -134,8 +135,8 @@ class _TabsScreenState extends State<TabsScreen> {
                   label: 'Favorites'),
               BottomNavigationBarItem(
                   backgroundColor: Color(0xfff6f7dd),
-                  icon: Icon(Icons.calendar_today),
-                  label: 'Time management'),
+                  icon: Icon(Icons.check_box),
+                  label: 'Todo list'),
             ],
           ),
         ),
