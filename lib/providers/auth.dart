@@ -35,13 +35,13 @@ class Authentication {
         if (!user.emailVerified) {
           auth.signOut();
           toast('Email ID not verified');
-        } 
+        } else if (user != null) {
           authNotifier.setUser(user);
           await getUserDetail(authNotifier);
-
-          Navigator.push(
-              context, MaterialPageRoute(builder: ((_) => const TabsScreen())));
         }
+        Navigator.push(
+            context, MaterialPageRoute(builder: ((_) => const TabsScreen())));
+      }
     } catch (e) {
       toast(e.toString());
     }
@@ -67,7 +67,6 @@ class Authentication {
         await user.sendEmailVerification();
         if (user != null) {
           await user.reload();
-
           uploadUserData(users, userDataUploaded);
           await auth.signOut();
           authNotifier.setUser(null);
@@ -85,13 +84,16 @@ class Authentication {
         .child(users.uuid.toString() + '.jpg');
     try {
       await ref.putFile(image!);
+      uploadUserData(users, userDataUploaded);
     } catch (e) {
+      print('ERROR:' + e.toString());
       print('Ko duoc ba oi');
     }
+
     try {
       users.avatar = await ref.getDownloadURL();
     } catch (e) {
-      print(e.toString());
+      print('error: ' + e.toString());
     }
   }
 
@@ -109,7 +111,7 @@ class Authentication {
       await userRef
           .doc(currentUser.uid)
           .set(users.toJson())
-          .catchError((e) => print(e))
+          .catchError((e) => print('error: ' + e))
           .then((value) => userDataUploadVar = true);
     }
   }
@@ -128,7 +130,7 @@ class Authentication {
 
   // initialize current user
   Future<void> initializeCurrentUser(AuthNotifier authNotifier) async {
-    User user = auth.currentUser!;
+    User? user = auth.currentUser;
 
     if (user != null) {
       authNotifier.setUser(user);
