@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:pomodoro/models/users.dart';
+import 'package:pomodoro/providers/auth_notifier.dart';
+import 'package:pomodoro/screens/tab_screen.dart';
+import 'package:pomodoro/services/storage_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/src/provider.dart';
 
 void showSnackBar(BuildContext context, String text) {
   ScaffoldMessenger.of(context).showSnackBar(
@@ -13,8 +18,7 @@ void showSnackBar(BuildContext context, String text) {
 }
 
 class AuthMethods extends ChangeNotifier {
-  final FirebaseAuth _auth;
-  AuthMethods(this._auth);
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // FOR EVERY FUNCTION HERE
   // POP THE ROUTE USING: Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
@@ -23,6 +27,8 @@ class AuthMethods extends ChangeNotifier {
   // using null check operator since this method should be called only
   // when the user is logged in
   User get user => _auth.currentUser!;
+  Users users =
+      Users(userName: '', email: '', password: '', avatar: '', uuid: '');
 
   // STATE PERSISTENCE STREAM
   Stream<User?> get authState => FirebaseAuth.instance.authStateChanges();
@@ -31,23 +37,45 @@ class AuthMethods extends ChangeNotifier {
   // Stream get authState => FirebaseAuth.instance.idTokenChanges();
   // KNOW MORE ABOUT THEM HERE: https://firebase.flutter.dev/docs/auth/start#auth-state
   // FACEBOOK SIGN IN
-  Future<void> signInWithFacebook(BuildContext context) async {
+  Future<void> signInWithFacebook(
+      BuildContext context, AuthNotifier authNotifier) async {
     try {
       final LoginResult loginResult = await FacebookAuth.instance.login();
 
       final OAuthCredential facebookAuthCredential =
           FacebookAuthProvider.credential(loginResult.accessToken!.token);
 
-      await _auth.signInWithCredential(facebookAuthCredential);
+      final UserCredential fbuser =
+          await _auth.signInWithCredential(facebookAuthCredential);
+      if (fbuser.user!.isAnonymous) {
+        User currentUser = fbuser.user!;
+        users.userName = currentUser.displayName ?? "No information";
+        users.avatar = currentUser.photoURL ??
+            "https://demofree.sirv.com/nope-not-here.jpg";
+        users.email = currentUser.email!;
+        users.uuid = currentUser.uid;
+      }
+      authNotifier.setUserDetails(users);
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: ((context) => const TabsScreen())));
+      SavingDataLocally.setLogin();
+      SavingDataLocally.setAuthMethods('facebook auth');
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
       print(e.message!); // Displaying the error message
     }
   }
 
-  //GOOGLE SIGN IN
+  // FACEBOOK SIGN OUT
+  Future facebookSignOut(AuthNotifier authNotifier) async {
+    await FacebookAuth.instance.logOut();
+    SavingDataLocally.setLogin(isLogin: false);
+    authNotifier.setUser(null);
+  }
+
   // GOOGLE SIGN IN
-  Future<void> signInWithGoogle(BuildContext context) async {
+  Future<void> signInWithGoogle(
+      BuildContext context, AuthNotifier authNotifier) async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
@@ -68,13 +96,32 @@ class AuthMethods extends ChangeNotifier {
         // for google sign in and google sign up, only one as of now),
         // do the following:
 
-        // if (userCredential.user != null) {
-        //   if (userCredential.additionalUserInfo!.isNewUser) {}
-        // }
+        if (userCredential.user != null) {
+          if (userCredential.additionalUserInfo!.isNewUser) {
+            User currentUser = userCredential.user!;
+            users.userName = currentUser.displayName as String;
+            users.avatar = currentUser.photoURL as String;
+            users.uuid = currentUser.uid as String;
+            print('${authNotifier.userDetails.avatar}hehe');
+          }
+          authNotifier.setUserDetails(users);
+          print('${authNotifier.userDetails.avatar}hehe');
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: ((context) => const TabsScreen())));
+          SavingDataLocally.setLogin();
+          SavingDataLocally.setAuthMethods('google auth');
+        }
       }
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!); // Displaying the error message
     }
+  }
+
+  // GOOGLE SIGN OUT
+  Future googleSignOut(AuthNotifier authNotifier) async {
+    await FirebaseAuth.instance.signOut();
+    SavingDataLocally.setLogin(isLogin: false);
+    authNotifier.setUser(null);
   }
 
   // final GoogleSignIn googleSignIn = GoogleSignIn();

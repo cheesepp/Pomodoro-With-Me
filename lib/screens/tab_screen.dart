@@ -26,20 +26,6 @@ class _TabsScreenState extends State<TabsScreen> {
   StreamSubscription? internetconnection;
   @override
   void initState() {
-    // internetconnection = Connectivity()
-    //     .onConnectivityChanged
-    //     .listen((ConnectivityResult result) {
-    //   // whenevery connection status is changed.
-    //   if (result != ConnectivityResult.mobile ||
-    //       result != ConnectivityResult.wifi) {
-    //     //connection is mobile data network
-    //     const AlertDialog(
-    //         content: AlertDialog(
-    //       content: Text("No Internet Connection"),
-    //     ));
-    //   }
-    // });
-
     _pages = [
       {
         'page': HomeScreen(),
@@ -64,40 +50,42 @@ class _TabsScreenState extends State<TabsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: StreamBuilder(
-          stream: Connectivity().onConnectivityChanged,
-          builder: (context, snapshot) {
-            // if (!snapshot.hasData)
-            //   return Center(
-            //     child: CircularProgressIndicator(),
-            //   );
-            if (snapshot.data != ConnectivityResult.wifi &&
-                snapshot.data != ConnectivityResult.mobile) {
-              return Center(
-                child: Container(
-                  width: double.infinity,
-                  height: 170,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                          width: 100,
-                          height: 100,
-                          child:
-                              Lottie.asset('assets/lotties/no_connect.json')),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        'No internet connection! Please check your wifi or mobile data again!',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
-            return SafeArea(child: _pages![_selectedPageIndex]['page']);
-          }),
+      body:
+          //  StreamBuilder(
+          //     stream: Connectivity().onConnectivityChanged,
+          //     builder: (context, snapshot) {
+          //       // if (!snapshot.hasData)
+          //       //   return Center(
+          //       //     child: CircularProgressIndicator(),
+          //       //   );
+          //       if (snapshot.data != ConnectivityResult.wifi &&
+          //           snapshot.data != ConnectivityResult.mobile) {
+          //         return Center(
+          //           child: Container(
+          //             width: double.infinity,
+          //             height: 170,
+          //             child: Column(
+          //               children: [
+          //                 SizedBox(
+          //                     width: 100,
+          //                     height: 100,
+          //                     child:
+          //                         Lottie.asset('assets/lotties/no_connect.json')),
+          //                 const SizedBox(
+          //                   height: 10,
+          //                 ),
+          //                 Text(
+          //                   'No internet connection! Please check your wifi or mobile data again!',
+          //                   style: TextStyle(fontWeight: FontWeight.bold),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
+          //         );
+          //       }
+          //       return SafeArea(child: _pages![_selectedPageIndex]['page']);
+          //     }),
+          SafeArea(child: _pages![_selectedPageIndex]['page']),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.white,

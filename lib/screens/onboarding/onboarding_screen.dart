@@ -5,7 +5,6 @@ import 'package:pomodoro/screens/tab_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../auth_screen/auth_screen.dart';
-import '../screens/homepage_screen.dart';
 import 'data/pages_view.dart';
 import 'model/page_view_model.dart';
 

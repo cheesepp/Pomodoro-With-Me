@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pomodoro/screens/tab_screen.dart';
 
-import '../../models/users.dart';
-import '../../providers/auth.dart';
-import '../../providers/auth_notifier.dart';
+import '../../../models/users.dart';
+import '../../../providers/auth.dart';
+import '../../../providers/auth_notifier.dart';
 import 'package:provider/provider.dart';
 
-import '../../services/auth_methods.dart';
-import '../../widgets/image_picker.dart';
-import '../../widgets/toast_widget.dart';
+import '../../../services/auth_methods.dart';
+import '../../../widgets/image_picker.dart';
+import '../../../widgets/toast_widget.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -152,8 +152,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 children: <Widget>[
                   IconButton(
                     onPressed: () {
-                      AuthMethods(FirebaseAuth.instance)
-                          .signInWithGoogle(context);
+                      // AuthMethods().signInWithGoogle(context);
                     },
                     icon: ImageIcon(
                       AssetImage('assets/icons/google.png'),
@@ -163,8 +162,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   IconButton(
                     onPressed: () {
-                      AuthMethods(FirebaseAuth.instance)
-                          .signInWithFacebook(context);
+                      // AuthMethods().signInWithFacebook(context,);
                     },
                     icon: ImageIcon(
                       AssetImage('assets/icons/facebook.png'),

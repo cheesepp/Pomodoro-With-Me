@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pomodoro/providers/pomo_duration.dart';
+import 'package:pomodoro/services/storage_data.dart';
 
 class _BarChart extends StatefulWidget {
   const _BarChart({Key? key}) : super(key: key);

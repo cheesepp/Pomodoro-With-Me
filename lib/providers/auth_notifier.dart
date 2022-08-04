@@ -12,10 +12,18 @@ class AuthNotifier extends ChangeNotifier {
   }
 
   Users? _userDetails;
-  Users get userDetails => _userDetails!;
+  Users get userDetails =>
+      _userDetails ??
+      Users(
+          avatar:
+              "https://i1.sndcdn.com/avatars-000214125831-5q6tdw-t500x500.jpg",
+          email: '',
+          password: '',
+          userName: 'Hehe boy',
+          uuid: '');
 
   void setUserDetails(Users users) {
     _userDetails = users;
-    notifyListeners();
+    print('${_userDetails!.avatar} / ${_userDetails!.userName}');
   }
 }

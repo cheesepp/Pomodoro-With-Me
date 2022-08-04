@@ -3,6 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SavingDataLocally {
   static SharedPreferences? _preferences;
 
+  static const _isLogin = "isLogin";
+  static const _logOutType = "logout";
+
   static const _keyLearning = 'learning';
   static const _keyBreaking = 'breaking';
   static const _keyRounds = 'rounds';
@@ -13,8 +16,18 @@ class SavingDataLocally {
   static const _keyLearnedFriday = 'friday';
   static const _keyLearnedSaturday = 'saturday';
   static const _keyLearnedSunday = 'sunday';
+
   static Future init() async =>
       _preferences = await SharedPreferences.getInstance();
+
+  static Future setAuthMethods(String logoutType) async =>
+      await _preferences!.setString(_logOutType, logoutType);
+
+  static getAuthMethods() => _preferences!.getString(_logOutType);
+
+  static Future setLogin({bool isLogin = true}) async =>
+      await _preferences!.setBool(_isLogin, isLogin);
+  static bool? getLogin() => _preferences!.getBool(_isLogin);
 
   static Future setLearningDuration(int learningDuration) async =>
       await _preferences!.setInt(_keyLearning, learningDuration);

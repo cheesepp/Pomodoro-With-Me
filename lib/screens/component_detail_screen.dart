@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pomodoro/providers/category_component.dart';
-import 'package:pomodoro/providers/pomo_duration.dart';
+import 'package:pomodoro/services/storage_data.dart';
 import 'package:pomodoro/widgets/digital_clock.dart';
 import 'package:pomodoro/widgets/settings_drawer.dart';
 import 'package:pomodoro/widgets/video_player_widget.dart';

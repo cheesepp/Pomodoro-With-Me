@@ -6,9 +6,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:pomodoro/auth_screen/auth_screen.dart';
+import 'package:pomodoro/screens/auth_screen/auth_screen.dart';
 import 'package:pomodoro/providers/auth_notifier.dart';
 import 'package:pomodoro/screens/tab_screen.dart';
+import 'package:pomodoro/services/storage_data.dart';
 
 import '../models/users.dart';
 import '../widgets/toast_widget.dart';
@@ -38,9 +39,13 @@ class Authentication {
         } else if (user != null) {
           authNotifier.setUser(user);
           await getUserDetail(authNotifier);
+          print('done');
+          print(authNotifier.userDetails.userName);
         }
         Navigator.push(
             context, MaterialPageRoute(builder: ((_) => const TabsScreen())));
+        SavingDataLocally.setLogin();
+        SavingDataLocally.setAuthMethods('email auth');
       }
     } catch (e) {
       toast(e.toString());
@@ -123,9 +128,10 @@ class Authentication {
         .doc(authNotifier.user!.uid)
         .get()
         .catchError((e) => print(e))
-        .then((value) => (value != null)
-            ? authNotifier.setUserDetails(Users.fromJson(value.data()!))
-            : print(value));
+        .then((value) {
+      print(value.data()!);
+      authNotifier.setUserDetails(Users.fromJson(value.data()!));
+    });
   }
 
   // initialize current user

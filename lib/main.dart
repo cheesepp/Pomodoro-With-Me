@@ -1,26 +1,26 @@
 import 'dart:async';
 import 'dart:io' as io;
-
+import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/services.dart';
-import 'package:pomodoro/onboarding/onboarding_screen.dart';
 import 'package:pomodoro/providers/auth_notifier.dart';
 import 'package:pomodoro/providers/category_component_items.dart';
 import 'package:pomodoro/providers/category_items.dart';
 import 'package:pomodoro/providers/handle_tasks.dart';
-import 'package:pomodoro/providers/pomo_duration.dart';
+import 'package:pomodoro/services/storage_data.dart';
 import 'package:pomodoro/screens/category_components_screen.dart';
 import 'package:pomodoro/screens/component_detail_screen.dart';
 import 'package:pomodoro/screens/favorite_screen.dart';
 import 'package:pomodoro/screens/homepage_screen.dart';
+import 'package:pomodoro/screens/onboarding/onboarding_screen.dart';
 import 'package:pomodoro/screens/tab_screen.dart';
 import 'package:pomodoro/screens/tasks_screen.dart';
-import 'package:pomodoro/screens/test.dart';
 import 'package:pomodoro/screens/time_manager_screen.dart';
 import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,9 +31,13 @@ void main() async {
 
   await SavingDataLocally.init();
   await Onboarding.init();
-  await Firebase.initializeApp();
-  runApp(ChangeNotifierProvider(
-      create: (BuildContext ctx) => AuthNotifier(), child: const MyApp()));
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(DevicePreview(
+    builder: ((context) => ChangeNotifierProvider(
+        create: (BuildContext ctx) => AuthNotifier(), child: const MyApp())),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -42,6 +46,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthNotifier>(context);
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(
@@ -55,6 +60,9 @@ class MyApp extends StatelessWidget {
           ),
         ],
         child: MaterialApp(
+            useInheritedMediaQuery: true,
+            locale: DevicePreview.locale(context),
+            builder: DevicePreview.appBuilder,
             debugShowCheckedModeBanner: false,
             title: 'Flutter Demo',
             theme: ThemeData(
@@ -65,7 +73,9 @@ class MyApp extends StatelessWidget {
             initialRoute: '/',
             // home: CategoriesScreen(),
             routes: {
-              '/': (ctx) => const OnboardingScreen(),
+              '/': (ctx) => SavingDataLocally.getLogin() ?? false
+                  ? const TabsScreen()
+                  : const OnboardingScreen(),
               TasksScreen.routeName: (ctx) => const TasksScreen(),
               HomeScreen.routeName: (ctx) => const HomeScreen(),
               FavoriteScreen.routeName: (context) => const FavoriteScreen(),

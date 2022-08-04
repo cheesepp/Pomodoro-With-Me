@@ -113,7 +113,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   height: 80,
                   width: 80,
                   child: Lottie.network(
-                      'https://assets6.lottiefiles.com/packages/lf20_if77rL.json',
+                      'https://assets3.lottiefiles.com/private_files/lf30_gdvhysw2.json',
                       fit: BoxFit.cover),
                 ),
                 const SizedBox(

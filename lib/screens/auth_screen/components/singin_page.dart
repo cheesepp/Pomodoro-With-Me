@@ -2,14 +2,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:pomodoro/models/users.dart';
 import 'package:pomodoro/services/auth_methods.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-import '../../models/users.dart';
-import '../../providers/auth.dart';
-import '../../providers/auth_notifier.dart';
+
 import 'package:provider/provider.dart';
 
-import '../../widgets/toast_widget.dart';
+import '../../../providers/auth.dart';
+import '../../../providers/auth_notifier.dart';
+import '../../../widgets/toast_widget.dart';
 
 class SignInPage extends StatefulWidget {
   SignInPage({Key? key, required this.onClicked}) : super(key: key);
@@ -43,9 +44,9 @@ class _SignInPageState extends State<SignInPage> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    _formKey.currentState!.save();
     AuthNotifier authNotifier =
         Provider.of<AuthNotifier>(context, listen: false);
+    _formKey.currentState!.save();
     RegExp regExp =
         RegExp(r'^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$');
     _users.email = _emailController.text.trim();
@@ -136,8 +137,9 @@ class _SignInPageState extends State<SignInPage> {
                 children: <Widget>[
                   IconButton(
                     onPressed: () {
-                      AuthMethods(FirebaseAuth.instance)
-                          .signInWithGoogle(context);
+                      AuthNotifier authNotifier =
+                          Provider.of<AuthNotifier>(context, listen: false);
+                      AuthMethods().signInWithGoogle(context, authNotifier);
                     },
                     icon: ImageIcon(
                       AssetImage('assets/icons/google.png'),
@@ -147,8 +149,9 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                   IconButton(
                     onPressed: () {
-                      AuthMethods(FirebaseAuth.instance)
-                          .signInWithFacebook(context);
+                      AuthNotifier authNotifier =
+                          Provider.of<AuthNotifier>(context, listen: false);
+                      AuthMethods().signInWithFacebook(context, authNotifier);
                     },
                     icon: ImageIcon(
                       AssetImage('assets/icons/facebook.png'),
