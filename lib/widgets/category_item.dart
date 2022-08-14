@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pomodoro/screens/category_components_screen.dart';
+import 'package:pomodoro/utils/ThemeColor.dart';
 
 import '../providers/category.dart';
 
@@ -14,13 +16,13 @@ class CategoryItem extends StatelessWidget {
   String get categoryText {
     switch (name) {
       case Categories.Code:
-        return 'Code';
+        return 'code'.tr;
         break;
       case Categories.Space:
-        return 'Space';
+        return 'space'.tr;
         break;
       case Categories.Beach:
-        return 'Beach';
+        return 'beach'.tr;
         break;
       case Categories.Anime:
         return 'Anime';
@@ -29,7 +31,7 @@ class CategoryItem extends StatelessWidget {
         return 'Cafe';
         break;
       case Categories.City:
-        return 'City';
+        return 'city'.tr;
         break;
       case Categories.Kpop:
         return 'K-pop';
@@ -38,10 +40,10 @@ class CategoryItem extends StatelessWidget {
         return 'Lofi';
         break;
       case Categories.Nature:
-        return 'Nature';
+        return 'nature'.tr;
         break;
       case Categories.Window:
-        return 'Window';
+        return 'window'.tr;
         break;
       default:
         return 'Unknown';
@@ -55,7 +57,7 @@ class CategoryItem extends StatelessWidget {
       width: 120,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-            primary: Color(0xfff6f7dd),
+            primary: Theme.of(context).accentColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(50),
             )),

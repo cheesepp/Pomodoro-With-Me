@@ -3,7 +3,7 @@ import 'package:pomodoro/providers/category.dart';
 import 'package:pomodoro/providers/category_component.dart';
 
 class CategoryItems with ChangeNotifier {
-  List<Category> _categoryData = [
+  final List<Category> _categoryData = [
     Category(
       id: 'c1',
       category: Categories.Code,

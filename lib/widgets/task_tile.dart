@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pomodoro/providers/handle_tasks.dart';
+import 'package:pomodoro/services/firebase_services.dart';
 import 'package:provider/provider.dart';
 import '../providers/task.dart';
 
@@ -12,14 +13,16 @@ class TaskTile extends StatefulWidget {
 }
 
 class _TaskTileState extends State<TaskTile> {
+  final GlobalKey _editKey =GlobalKey();
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   void _editTask(BuildContext context) {
-    print('hehe');
+
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
         builder: (context) => SingleChildScrollView(
+          key: _editKey,
               child: Container(
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -60,10 +63,11 @@ class _TaskTileState extends State<TaskTile> {
                             child: const Text('cancel'),
                           ),
                           ElevatedButton(
-                              onPressed: () {
-                                context
-                                    .read<HandleTasks>()
-                                    .editTask(widget.task);
+                              onPressed: () async {
+                                await context
+                                    .read<FirebaseService>()
+                                    .updateTask(widget.task);
+                              
                                 Navigator.pop(context);
                               },
                               child: const Text('Change'))
@@ -74,6 +78,7 @@ class _TaskTileState extends State<TaskTile> {
                 ),
               ),
             ));
+    print('hehe');
   }
 
   @override
@@ -85,6 +90,7 @@ class _TaskTileState extends State<TaskTile> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Row(
@@ -93,10 +99,6 @@ class _TaskTileState extends State<TaskTile> {
           Expanded(
             child: Row(
               children: [
-                const Icon(Icons.star_outline),
-                const SizedBox(
-                  width: 10,
-                ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -110,8 +112,7 @@ class _TaskTileState extends State<TaskTile> {
                         )),
                     Text(DateFormat()
                         .add_yMMMd()
-                        .add_Hms()
-                        .format(DateTime.now())),
+                        .format(DateTime.parse(widget.task.date))),
                   ],
                 ),
               ],
@@ -121,33 +122,32 @@ class _TaskTileState extends State<TaskTile> {
             children: [
               Checkbox(
                 value: widget.task.isDone,
-                onChanged: widget.task.isDeleted! == false
-                    ? (value) {
+                onChanged:
+                    (value) async {
                         context.read<HandleTasks>().updateTask(widget.task);
+                        await context.read<FirebaseService>().updateTask(widget.task);
                       }
-                    : null,
+
               ),
               PopupMenuButton(
                   itemBuilder: widget.task.isDeleted == false
                       ? (((ctx) => [
                             PopupMenuItem(
                                 child: TextButton.icon(
-                                    onPressed: null,
+                                    onPressed: () => _editTask(context),
                                     icon: const Icon(Icons.edit),
                                     label: const Text('Edit')),
                                 onTap: () => _editTask(context)),
-                            PopupMenuItem(
-                                child: TextButton.icon(
-                                    onPressed: null,
-                                    icon: const Icon(Icons.bookmark),
-                                    label: const Text('Add to Bookmarks')),
-                                onTap: () {}),
+
                             PopupMenuItem(
                                 child: TextButton.icon(
                                     onPressed: null,
                                     icon: const Icon(Icons.delete),
                                     label: const Text('Delete')),
-                                onTap: () {}),
+                                onTap: () {
+                                  print(context.read<HandleTasks>().items);
+                                  context.read<FirebaseService>().removeTask(widget.task);
+                                }),
                           ]))
                       : (context) => [
                             PopupMenuItem(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pomodoro/utils/ThemeColor.dart';
 
 class SettingDrawer extends StatefulWidget {
   SettingDrawer(
@@ -35,7 +37,7 @@ class _SettingDrawerState extends State<SettingDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xffEDDFB3),
+      backgroundColor:Theme.of(context).accentColor,
       child: Column(
         children: <Widget>[
           Container(
@@ -43,14 +45,14 @@ class _SettingDrawerState extends State<SettingDrawer> {
             width: double.infinity,
             padding: EdgeInsets.all(20),
             alignment: Alignment.centerLeft,
-            color: Theme.of(context).accentColor,
+            color: Theme.of(context).backgroundColor,
             child: Column(
               children: [
                 const SizedBox(
                   height: 70,
                 ),
                 Text(
-                  'Settings',
+                  'drawer_settings'.tr,
                   style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 30,
@@ -62,11 +64,11 @@ class _SettingDrawerState extends State<SettingDrawer> {
           const SizedBox(
             height: 20,
           ),
-          buildListTile('Learn Duration', 'assets/icons/studying.jpg',
+          buildListTile('drawer_learn'.tr, 'assets/icons/studying.jpg',
               widget.learnDuration),
-          buildListTile('Break Duration', 'assets/icons/relaxing.png',
+          buildListTile('drawer_break'.tr, 'assets/icons/relaxing.png',
               widget.breakDuration),
-          buildListTile('Rounds', 'assets/icons/tomato.png', widget.rounds),
+          buildListTile('drawer_rounds'.tr, 'assets/icons/tomato.png', widget.rounds),
         ],
       ),
     );

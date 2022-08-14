@@ -7,6 +7,7 @@ import 'package:pomodoro/widgets/digital_clock.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/category.dart';
+import '../utils/ThemeColor.dart';
 
 class CategoryComponentsScreen extends StatefulWidget {
   static const routeName = '/category_components';
@@ -20,11 +21,13 @@ class CategoryComponentsScreen extends StatefulWidget {
 class _CategoryComponentsScreenState extends State<CategoryComponentsScreen> {
   @override
   Widget build(BuildContext context) {
-    final categoryComponents = Provider.of<CategoryComponentItems>(context);
+
+    final categoryComponents = Provider.of<CategoryComponentItems>(context, listen: false);
     final routeArgs =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     final displayedComponents =
         categoryComponents.fetchComponentsByCategory(routeArgs['category']);
+    print('${displayedComponents.length}');
     return Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         body: SafeArea(
@@ -81,10 +84,8 @@ class _CategoryComponentsScreenState extends State<CategoryComponentsScreen> {
                         )),
                     itemCount: displayedComponents.length,
                     itemBuilder: (ctx, index) {
-                      return ChangeNotifierProvider.value(
-                        value: displayedComponents[index],
-                        child: CategoryComponentItem(),
-                      );
+                      print("${displayedComponents.length}");
+                      return CategoryComponentItem(component: displayedComponents.elementAt(index));
                     }),
               ),
             ],

@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,16 +13,168 @@ import 'package:pomodoro/services/storage_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/src/provider.dart';
 
-void showSnackBar(BuildContext context, String text) {
+import '../screens/auth_screen/auth_screen.dart';
+import '../widgets/toast_widget.dart';
+
+void showSnackBar(BuildContext context, String text,{ Color? color, Color? textColor} ) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(text),
+      content: Text(text, style: TextStyle(color: textColor),),
+      backgroundColor: color,
     ),
   );
 }
 
 class AuthMethods extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  //login
+  Future<void> login(
+      Users users, AuthNotifier authNotifier, BuildContext context) async {
+    UserCredential? result;
+
+    try {
+      result = await _auth.signInWithEmailAndPassword(
+          email: users.email, password: users.password);
+    } catch (e) {
+      toast('Sai roi ba');
+    }
+
+    //check verification
+    try {
+      if (result != null) {
+        User user = _auth.currentUser!;
+        if (!user.emailVerified) {
+          _auth.signOut();
+          toast('Email ID not verified');
+        } else if (user != null) {
+          authNotifier.setUser(user);
+          await getUserDetail(authNotifier);
+          print('done');
+          print(authNotifier.userDetails.userName);
+        }
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: ((_) => const TabsScreen())));
+        SavingDataLocally.setLogin();
+        SavingDataLocally.setAuthMethods('email auth');
+      }
+    } catch (e) {
+      toast(e.toString());
+    }
+  }
+
+  //sign up
+  Future<void> signUp(Users users, File? image, AuthNotifier authNotifier,
+      BuildContext context) async {
+    UserCredential? result;
+    bool userDataUploaded = false;
+    try {
+      result = await _auth.createUserWithEmailAndPassword(
+          email: users.email, password: users.password);
+      print(users.email + " " + users.password);
+    } catch (e) {
+      toast(e.toString());
+    }
+
+    try {
+      if (result != null) {
+        await _auth.currentUser!.updateDisplayName(users.userName);
+
+        User user = result.user!;
+        await user.sendEmailVerification();
+        if (user != null) {
+          await user.reload();
+          uploadUserData(users, userDataUploaded);
+          await _auth.signOut();
+          authNotifier.setUser(null);
+
+          toast('Verification link is sent to ${user.email}');
+        }
+      }
+    } catch (e) {
+      toast(e.toString());
+    }
+
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('user_image')
+        .child(user.uid.toString() + '.jpg');
+    try {
+      await ref.putFile(image!);
+      await uploadUserData(users, userDataUploaded);
+    } catch (e) {
+      print('ERROR:' + e.toString());
+      print('Ko duoc ba oi');
+    }
+
+    try {
+      users.avatar = await ref.getDownloadURL();
+    } catch (e) {
+      print('error: ' + e.toString());
+    }
+  }
+
+  //up load user data
+  Future<void> uploadUserData(Users users, bool userDataUploaded) async {
+    bool userDataUploadVar = userDataUploaded;
+
+    User currentUser = _auth.currentUser!;
+    users.avatar = await FirebaseStorage.instance
+        .ref()
+        .child('user_image')
+        .child(currentUser.uid.toString() + '.jpg').getDownloadURL();
+
+    users.uuid = currentUser.uid;
+    CollectionReference userRef =
+    FirebaseFirestore.instance.collection('users');
+
+    // check data uploaded or not
+    if (!userDataUploadVar) {
+      await userRef
+          .doc(currentUser.uid)
+          .set(users.toJson())
+          .catchError((e) => print('errorrrrr'
+          ': ' + e))
+          .then((value) {
+            print(users.toJson());
+            userDataUploadVar = true;
+
+      });
+    }
+  }
+
+  //get user details
+  Future<void>? getUserDetail(AuthNotifier authNotifier) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(authNotifier.user!.uid)
+        .get()
+        .catchError((e) => print(e))
+        .then((value) {
+      print(value.data()!);
+      authNotifier.setUserDetails(Users.fromJson(value.data()!));
+    });
+  }
+
+  // initialize current user
+  Future<void> initializeCurrentUser(AuthNotifier authNotifier) async {
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      authNotifier.setUser(user);
+      await getUserDetail(authNotifier);
+    }
+  }
+
+  //sign out
+  Future<void> signOut(AuthNotifier authNotifier, BuildContext context) async {
+    await _auth.signOut();
+
+    authNotifier.setUser(null);
+    print('Logout');
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (_) => const AuthScreen()));
+  }
 
   // FOR EVERY FUNCTION HERE
   // POP THE ROUTE USING: Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
@@ -47,19 +203,24 @@ class AuthMethods extends ChangeNotifier {
 
       final UserCredential fbuser =
           await _auth.signInWithCredential(facebookAuthCredential);
+      bool userDataUploaded = false;
+      User currentUser = fbuser.user!;
+      users.userName = currentUser.displayName ?? "No information";
+      users.avatar = currentUser.photoURL ??
+          "https://demofree.sirv.com/nope-not-here.jpg";
+      users.email = currentUser.email!;
+      users.uuid = currentUser.uid;
+
       if (fbuser.user!.isAnonymous) {
-        User currentUser = fbuser.user!;
-        users.userName = currentUser.displayName ?? "No information";
-        users.avatar = currentUser.photoURL ??
-            "https://demofree.sirv.com/nope-not-here.jpg";
-        users.email = currentUser.email!;
-        users.uuid = currentUser.uid;
+        uploadUserData(users, userDataUploaded);
+        print('${authNotifier.userDetails.avatar}hehe');
       }
       authNotifier.setUserDetails(users);
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: ((context) => const TabsScreen())));
       SavingDataLocally.setLogin();
       SavingDataLocally.setAuthMethods('facebook auth');
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: ((context) => const TabsScreen())));
+
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
       print(e.message!); // Displaying the error message
@@ -67,10 +228,13 @@ class AuthMethods extends ChangeNotifier {
   }
 
   // FACEBOOK SIGN OUT
-  Future facebookSignOut(AuthNotifier authNotifier) async {
+  Future facebookSignOut(AuthNotifier authNotifier, BuildContext context) async {
     await FacebookAuth.instance.logOut();
     SavingDataLocally.setLogin(isLogin: false);
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: ((context) => const AuthScreen())));
     authNotifier.setUser(null);
+    authNotifier.setUserDetails(Users(userName: '', email: '', password: '', avatar: '', uuid: ''));
   }
 
   // GOOGLE SIGN IN
@@ -97,13 +261,16 @@ class AuthMethods extends ChangeNotifier {
         // do the following:
 
         if (userCredential.user != null) {
+          bool userDataUploaded = false;
+          User currentUser = userCredential.user!;
+          users.userName = currentUser.displayName as String;
+          users.avatar = currentUser.photoURL as String;
+          users.uuid = currentUser.uid as String;
           if (userCredential.additionalUserInfo!.isNewUser) {
-            User currentUser = userCredential.user!;
-            users.userName = currentUser.displayName as String;
-            users.avatar = currentUser.photoURL as String;
-            users.uuid = currentUser.uid as String;
+            uploadUserData(users, userDataUploaded);
             print('${authNotifier.userDetails.avatar}hehe');
           }
+
           authNotifier.setUserDetails(users);
           print('${authNotifier.userDetails.avatar}hehe');
           Navigator.pushReplacement(context,
@@ -118,105 +285,13 @@ class AuthMethods extends ChangeNotifier {
   }
 
   // GOOGLE SIGN OUT
-  Future googleSignOut(AuthNotifier authNotifier) async {
+  Future googleSignOut(BuildContext context, AuthNotifier authNotifier) async {
     await FirebaseAuth.instance.signOut();
     SavingDataLocally.setLogin(isLogin: false);
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: ((context) => const AuthScreen())));
     authNotifier.setUser(null);
+    authNotifier.setUserDetails(Users(userName: '', email: '', password: '', avatar: '', uuid: ''));
   }
 
-  // final GoogleSignIn googleSignIn = GoogleSignIn();
-
-  // bool _isSignedIn = false;
-  // bool get isSignedIn => _isSignedIn;
-
-  // //hasError, errorCode, provider,uid, email, name, imageUrl
-  // bool _hasError = false;
-  // bool get hasError => _hasError;
-
-  // String? _errorCode;
-  // String? get errorCode => _errorCode;
-
-  // String? _provider;
-  // String? get provider => _provider;
-
-  // String? _uid;
-  // String? get uid => _uid;
-
-  // String? _name;
-  // String? get name => _name;
-
-  // String? _email;
-  // String? get email => _email;
-
-  // String? _imageUrl;
-  // String? get imageUrl => _imageUrl;
-
-  // SignInProvider() {
-  //   checkSignInUser();
-  // }
-
-  // Future checkSignInUser() async {
-  //   final SharedPreferences s = await SharedPreferences.getInstance();
-  //   _isSignedIn = s.getBool("signed_in") ?? false;
-  //   notifyListeners();
-  // }
-
-  // Future setSignIn() async {
-  //   final SharedPreferences s = await SharedPreferences.getInstance();
-  //   s.setBool("signed_in", true);
-  //   _isSignedIn = true;
-  //   notifyListeners();
-  // }
-
-  // // sign in with google
-  // Future signInWithGoogle() async {
-  //   final GoogleSignInAccount? googleSignInAccount =
-  //       await googleSignIn.signIn();
-
-  //   if (googleSignInAccount != null) {
-  //     // executing our authentication
-  //     try {
-  //       final GoogleSignInAuthentication googleSignInAuthentication =
-  //           await googleSignInAccount.authentication;
-  //       final AuthCredential credential = GoogleAuthProvider.credential(
-  //         accessToken: googleSignInAuthentication.accessToken,
-  //         idToken: googleSignInAuthentication.idToken,
-  //       );
-
-  //       // signing to firebase user instance
-  //       final User userDetails =
-  //           (await _auth.signInWithCredential(credential)).user!;
-
-  //       // now save all values
-  //       _name = userDetails.displayName;
-  //       _email = userDetails.email;
-  //       _imageUrl = userDetails.photoURL;
-  //       _provider = "GOOGLE";
-  //       _uid = userDetails.uid;
-  //       notifyListeners();
-  //     } on FirebaseAuthException catch (e) {
-  //       switch (e.code) {
-  //         case "account-exists-with-different-credential":
-  //           _errorCode =
-  //               "You already have an account with us. Use correct provider";
-  //           _hasError = true;
-  //           notifyListeners();
-  //           break;
-
-  //         case "null":
-  //           _errorCode = "Some unexpected error while trying to sign in";
-  //           _hasError = true;
-  //           notifyListeners();
-  //           break;
-  //         default:
-  //           _errorCode = e.toString();
-  //           _hasError = true;
-  //           notifyListeners();
-  //       }
-  //     }
-  //   } else {
-  //     _hasError = true;
-  //     notifyListeners();
-  //   }
-  // }
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UserImagePicker extends StatefulWidget {
@@ -30,6 +31,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         CircleAvatar(
           radius: 40,
@@ -38,13 +40,16 @@ class _UserImagePickerState extends State<UserImagePicker> {
               ? FileImage(widget.pickedImage!)
               : null,
         ),
-        FlatButton.icon(
-          textColor: Theme.of(context).primaryColor,
-          onPressed: widget.pickImage,
-          icon: Icon(Icons.image),
-          label: const Text(
-            'Add Image',
-            style: TextStyle(color: Colors.black),
+        Padding(
+          padding: const EdgeInsets.only(right: 28.0),
+          child: FlatButton.icon(
+            textColor: Theme.of(context).primaryColor,
+            onPressed: widget.pickImage,
+            icon: const Icon(Icons.image),
+            label: Text(
+              'add_image'.tr,
+              style: const TextStyle(color: Colors.black),
+            ),
           ),
         ),
       ],

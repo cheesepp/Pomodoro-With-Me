@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pomodoro/screens/tab_screen.dart';
 
 import '../../../models/users.dart';
-import '../../../providers/auth.dart';
 import '../../../providers/auth_notifier.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +26,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Users _users =
       Users(userName: '', email: '', password: '', uuid: '', avatar: '');
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  Authentication _authentication = Authentication();
+  AuthMethods _authentication = AuthMethods();
   File? _pickedImage;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -94,7 +94,7 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Form(
           key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               UserImagePicker(_pickImage, _pickedImage),
               const SizedBox(
@@ -119,7 +119,7 @@ class _SignUpPageState extends State<SignUpPage> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ElevatedButton(
-                  child: const Text('Sign up!',
+                  child: Text('login_signup'.tr,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
@@ -199,11 +199,11 @@ class _SignUpPageState extends State<SignUpPage> {
             }
             return null;
           },
-          decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.account_circle_sharp),
+          decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.account_circle_sharp),
               border: InputBorder.none,
-              labelText: 'User name'),
-          style: TextStyle(height: 0.5)),
+              labelText: 'username'.tr),
+          style: const TextStyle(height: 0.5)),
     );
   }
 
@@ -236,8 +236,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     showPassword ? Icons.visibility_off : Icons.visibility),
               ),
               border: InputBorder.none,
-              labelText: 'Password'),
-          style: TextStyle(height: 0.5)),
+              labelText: 'login_password'.tr),
+          style: const TextStyle(height: 0.5)),
     );
   }
 
@@ -270,7 +270,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     showPassword ? Icons.visibility_off : Icons.visibility),
               ),
               border: InputBorder.none,
-              labelText: 'Confirm Password'),
+              labelText: 'confirm'.tr),
           style: TextStyle(height: 0.5)),
     );
   }

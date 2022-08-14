@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pomodoro/models/users.dart';
 import 'package:pomodoro/services/auth_methods.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 import 'package:provider/provider.dart';
 
-import '../../../providers/auth.dart';
 import '../../../providers/auth_notifier.dart';
 import '../../../widgets/toast_widget.dart';
 
@@ -28,7 +28,7 @@ class _SignInPageState extends State<SignInPage> {
   bool _isLogin = true;
   Users _users =
       Users(email: '', password: '', uuid: '', userName: '', avatar: '');
-  Authentication _authentication = Authentication();
+  AuthMethods _authentication = AuthMethods();
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
@@ -108,11 +108,11 @@ class _SignInPageState extends State<SignInPage> {
                 children: [
                   Text.rich(
                     TextSpan(children: [
-                      const TextSpan(text: 'Do not have an account? '),
+                      TextSpan(text: 'no_acc'.tr + " "),
                       TextSpan(
                           recognizer: TapGestureRecognizer()
                             ..onTap = widget.onClicked,
-                          text: 'Sign up!',
+                          text: 'login_signup'.tr,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black)),
@@ -192,7 +192,7 @@ class _SignInPageState extends State<SignInPage> {
                     showPassword ? Icons.visibility_off : Icons.visibility),
               ),
               border: InputBorder.none,
-              labelText: 'Password'),
+              labelText: 'login_password'.tr),
           style: TextStyle(height: 0.5)),
     );
   }

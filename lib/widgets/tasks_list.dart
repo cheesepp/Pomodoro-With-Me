@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:pomodoro/utils/ThemeColor.dart';
 import 'package:pomodoro/widgets/task_tile.dart';
 
 import '../providers/task.dart';
@@ -9,7 +11,7 @@ class TaskList extends StatelessWidget {
     required this.taskList,
   }) : super(key: key);
 
-  final List<Task> taskList;
+  final Set<Task> taskList;
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +21,8 @@ class TaskList extends StatelessWidget {
         children: taskList
             .map((task) => ExpansionPanelRadio(
                 backgroundColor: task.isDone!
-                    ? const Color(0xfff6f7dd).withOpacity(0.3)
-                    : const Color(0xfff6f7dd),
+                    ? Theme.of(context).accentColor.withOpacity(0.3)
+                    : Theme.of(context).accentColor,
                 value: task.id,
                 headerBuilder: (context, isOpen) => TaskTile(
                       task: task,
@@ -32,14 +34,24 @@ class TaskList extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     TextSpan(
-                      text: '${task.title}\n',
+                      text: '${task.title}\n\n',
                     ),
                     const TextSpan(
                       text: 'Description\n',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     TextSpan(
-                      text: '${task.description}\n',
+                      text: '${task.description}\n\n',
+                    ),
+                    const TextSpan(
+                      text: 'Time\n',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: '${DateFormat()
+                          .add_yMMMd()
+                          .add_Hms()
+                          .format(DateTime.parse(task.date))}\n\n',
                     ),
                   ])),
                 )))

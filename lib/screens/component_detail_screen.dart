@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:like_button/like_button.dart';
 import 'package:pomodoro/providers/category_component.dart';
+import 'package:pomodoro/services/auth_methods.dart';
+import 'package:pomodoro/services/firebase_services.dart';
 import 'package:pomodoro/services/storage_data.dart';
+import 'package:pomodoro/utils/ThemeColor.dart';
 import 'package:pomodoro/widgets/digital_clock.dart';
 import 'package:pomodoro/widgets/settings_drawer.dart';
 import 'package:pomodoro/widgets/video_player_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:async';
 import 'package:volume_controller/volume_controller.dart';
 import 'package:duration_picker/duration_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 // import 'package:assets_audio_player/assets_audio_player.dart';
 
 class ComponentDetailScreen extends StatefulWidget {
@@ -91,7 +98,7 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
         builder: (_) {
           return AlertDialog(
             backgroundColor: const Color(0xffEDDFB3),
-            title: const Text('Choose your rounds'),
+            title: Text('choose_round'.tr),
             content: TextFormField(
               decoration: const InputDecoration(
                   icon: ImageIcon(
@@ -104,7 +111,7 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Cancel')),
+                  child: Text('cancel'.tr)),
               TextButton(
                   onPressed: () {
                     if (int.parse(roundsController.text) < 10) {
@@ -126,7 +133,7 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
         });
   }
 
-  void addTime() {
+  void addTime(BuildContext context) {
     const subSecond = -1;
     setState(() {
       final seconds = learningDuration.inSeconds + subSecond;
@@ -140,7 +147,8 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
         // assetsAudioPlayer.play();
         isBreakingCompleted = !isBreakingCompleted;
         isLearningCompleted = !isLearningCompleted;
-        startBreak();
+        Future. delayed(Duration(seconds: 5), (){ startBreak(); });
+        showSnackBar(context, "Let's take some break! ☕", color: Theme.of(context).accentColor , textColor: Colors.black);
         print('start');
         reset();
       } else {
@@ -196,9 +204,9 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     });
   }
 
-  void startTimer() {
+  void startTimer(BuildContext context) {
     learningTimer =
-        Timer.periodic(const Duration(seconds: 1), (_) => addTime());
+        Timer.periodic(const Duration(seconds: 1), (_) => addTime(context));
     setState(() {
       isBreakingCompleted = true;
       isLearningCompleted = false;
@@ -254,6 +262,8 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final firebaseService = Provider.of<FirebaseService>(context);
     return Scaffold(
       key: _scaffoldState,
       endDrawer: SettingDrawer(
@@ -320,7 +330,7 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
                   height: 200,
                   width: 300,
                   decoration: BoxDecoration(
-                      color: const Color(0xfff6f7dd),
+                      color: Theme.of(context).accentColor,
                       borderRadius: BorderRadius.circular(30),
                       boxShadow: const [
                         BoxShadow(
@@ -417,7 +427,7 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
                               isPlaying = !isPlaying;
                               if (isPlaying) {
                                 videoController!.play();
-                                startTimer();
+                                startTimer(context);
                               } else {
                                 learningTimer?.cancel();
                                 videoController!.pause();
@@ -451,15 +461,39 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
                   const SizedBox(
                     width: 10,
                   ),
+                  // LikeButton(
+                  //   size: 60,
+                  //   isLiked: widget.component.isFavorite,
+                  //   likeBuilder: (bool isLiked) {
+                  //     return Icon(
+                  //       Icons.favorite,
+                  //       color: isLiked ? Colors.red : Colors.grey,
+                  //       size: 60,
+                  //     );
+                  //   },
+                  //   onTap: (value) async {
+                  //     bool isloading = true;
+                  //      widget.component.isFavorite = await !widget.component.isFavorite;
+                  //      if(isloading) {
+                  //        showSnackBar(context, "Loading...");
+                  //        await firebaseService.addFavorite(widget.component);
+                  //        print('ok');
+                  //        isloading = false;
+                  //      }
+                  //      return widget.component.isFavorite;
+                  //   },
+                  // ),
                   IconButton(
                     splashColor: Colors.transparent,
                     iconSize: 60,
-                    onPressed: () {
-                      setState(() {
-                        widget.component.isFavorite =
-                            !widget.component.isFavorite;
-                        print(widget.component.isFavorite);
-                      });
+                    onPressed: () async {
+                      bool isloading = true;
+                      if(isloading) {
+                        await firebaseService.addFavorite(widget.component);
+                        isloading = false;
+                      }
+                      if(widget.component.isFavorite) showSnackBar(context, "fav_snack".tr, color: Color(0xffb22b27));
+
                     },
                     icon: widget.component.isFavorite
                         ? const Icon(
@@ -491,6 +525,25 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
                   ),
                 ],
               ),
+              SizedBox(height: size.height*0.01,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("youtube".tr + ": ", style: TextStyle(color: Colors.white)),
+                  IconButton(onPressed: () async {
+                    print("comminh");
+                    final url = widget.component.ytbUrl;
+                    if(await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(
+                          Uri.parse(url),
+                        mode: LaunchMode.externalApplication
+                          );
+                      print("hehe");
+                    }
+                  }, icon: Image.asset('assets/icons/youtube.png', color: Colors.white, width: 30, height: 20,)),
+                ],
+              )
+
             ],
           ),
         ),

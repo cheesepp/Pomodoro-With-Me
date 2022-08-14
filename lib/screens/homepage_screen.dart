@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pomodoro/providers/auth_notifier.dart';
 import 'package:pomodoro/providers/category_component.dart';
 import 'package:pomodoro/providers/category_component_items.dart';
 import 'package:pomodoro/providers/category_items.dart';
+import 'package:pomodoro/screens/info_screen/info_screen.dart';
 import 'package:pomodoro/services/auth_methods.dart';
 import 'package:pomodoro/services/storage_data.dart';
+import 'package:pomodoro/utils/ThemeColor.dart';
 import 'package:pomodoro/widgets/category_item.dart';
 import 'package:pomodoro/widgets/digital_clock.dart';
 import 'package:provider/provider.dart';
-
-import '../providers/auth.dart';
-
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   static const routeName = '/categories';
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     final categoryComponents = Provider.of<CategoryComponentItems>(context);
     final categories = Provider.of<CategoryItems>(context);
+    final authMethods = Provider.of<AuthMethods>(context);
     final authNotifier = Provider.of<AuthNotifier>(context, listen: false);
     print(
         '${authNotifier.userDetails.avatar} ====== ${authNotifier.userDetails.userName}');
@@ -40,50 +47,55 @@ class HomeScreen extends StatelessWidget {
             } else {
               return Container(
                 margin: const EdgeInsets.only(top: 60),
-                // padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 7),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 25,
-                        ),
-                        CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            authNotifier.userDetails.avatar,
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => InfoScreen()));
+                      },
+                      child: Row(
+                        children: [
+                          const SizedBox(
+                            width: 25,
                           ),
-                        ),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Text(
-                          'Hello, ${authNotifier.userDetails.userName}!',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20),
-                        ),
-                        Expanded(child: Container()),
-                        IconButton(
-                            onPressed: () {
-                              String logoutType =
-                                  SavingDataLocally.getAuthMethods();
-                              switch (logoutType) {
-                                case 'facebook auth':
-                                  AuthMethods().facebookSignOut(authNotifier);
-                                  break;
-                                case 'google auth':
-                                  AuthMethods().googleSignOut(authNotifier);
-                                  break;
-                                default:
-                                  Authentication()
-                                      .signOut(authNotifier, context);
-                              }
-                            },
-                            icon: const Icon(Icons.logout)),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                      ],
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              authNotifier.userDetails.avatar,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          Text(
+                            'Hello, ${authNotifier.userDetails.userName}!',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+                          ),
+                          Expanded(child: Container()),
+                          IconButton(
+                              onPressed: () async {
+                                String logoutType =
+                                    SavingDataLocally.getAuthMethods();
+                                switch (logoutType) {
+                                  case 'facebook auth':
+                                    await authMethods.facebookSignOut(authNotifier, context);
+                                    break;
+                                  case 'google auth':
+                                    await authMethods.googleSignOut(context, authNotifier);
+                                    print('ok');
+                                    break;
+                                  default:
+                                    await authMethods
+                                        .signOut(authNotifier, context);
+                                }
+                              },
+                              icon: const Icon(Icons.logout)),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
@@ -93,8 +105,8 @@ class HomeScreen extends StatelessWidget {
                         width: 10,
                       ),
                       const DigitalClockBuilder(),
-                      const SizedBox(
-                        width: 30,
+                      SizedBox(
+                        width: size.width * 0.02,
                       ),
                       Container(
                         height: 80,
@@ -103,11 +115,11 @@ class HomeScreen extends StatelessWidget {
                         child: Lottie.network(
                             'https://assets10.lottiefiles.com/packages/lf20_oojuetow.json'),
                       ),
-                      const SizedBox(
-                        width: 10,
+                      SizedBox(
+                        width: size.width * 0.00009,
                       ),
-                      const Text(
-                        'Category',
+                      Text(
+                        'category'.tr,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 30,
@@ -148,11 +160,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               );
             }
-            //  else {
-            //   return Center(
-            //     child: CircularProgressIndicator(),
-            //   );
-            // }
           }),
     );
   }

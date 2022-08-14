@@ -11,10 +11,21 @@ class CategoryComponentItems with ChangeNotifier {
     return [..._items];
   }
 
-  List<CategoryComponent> fetchComponentsByCategory(Categories category) {
-    return [
-      ..._items.where((element) => element.categories.contains(category))
-    ];
+  Set<CategoryComponent> fetchComponentsByCategory(Categories category) {
+    Set<CategoryComponent> temp = {};
+    for(CategoryComponent element in _items) {
+      if(element.categories.contains(category)) {
+        temp.add(element);
+      }
+    }
+    for (int i = 0;i < temp.length - 1;i++){
+      for (int j = i+1;j < temp.length;j++){
+        if (temp.elementAt(i).id == temp.elementAt(j).id) {
+          temp.remove(temp.elementAt(j));
+        }
+      }
+    }
+    return temp;
   }
 
   CategoryComponent fetchComponent(String id) {
@@ -44,15 +55,6 @@ class CategoryComponentItems with ChangeNotifier {
     });
   }
 
-  // Stream<List<CategoryComponent>> readSnapshot() {
-  //   return FirebaseFirestore.instance
-  //       .collection('category-component')
-  //       .snapshots()
-  //       .map((snapshot) => snapshot.docs
-  //           .map((doc) => _items.add(
-  //               CategoryComponent.fromJson(doc.data() as Map<String, dynamic>)))
-  //           .toList() as List<CategoryComponent>);
-  // }
   Future<void> getCategoriesCollectionFromFirebase() async {
     final _instance = FirebaseFirestore.instance;
     CollectionReference categories = _instance.collection('category-component');

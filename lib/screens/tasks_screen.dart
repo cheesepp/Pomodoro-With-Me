@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pomodoro/providers/handle_tasks.dart';
+import 'package:pomodoro/utils/ThemeColor.dart';
+import 'package:pomodoro/widgets/expanded_section.dart';
+import 'package:pomodoro/widgets/task_tile.dart';
 import 'package:uuid/uuid.dart';
 import 'package:provider/provider.dart';
 import '../providers/task.dart';
+import '../services/firebase_services.dart';
 import '../widgets/tasks_list.dart';
 
 class TasksScreen extends StatefulWidget {
@@ -31,8 +36,8 @@ class _TasksScreenState extends State<TasksScreen> {
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
                     children: [
-                      const Text(
-                        'Add Task',
+                      Text(
+                        "add_task".tr,
                         style: TextStyle(fontSize: 24),
                       ),
                       const SizedBox(
@@ -41,8 +46,8 @@ class _TasksScreenState extends State<TasksScreen> {
                       TextField(
                         autofocus: true,
                         controller: titleController,
-                        decoration: const InputDecoration(
-                            label: Text('Title'), border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                            label: Text('title'.tr), border: OutlineInputBorder()),
                       ),
                       const SizedBox(
                         height: 30,
@@ -52,8 +57,8 @@ class _TasksScreenState extends State<TasksScreen> {
                         controller: descriptionController,
                         minLines: 3,
                         maxLines: 5,
-                        decoration: const InputDecoration(
-                            label: Text('Description'),
+                        decoration: InputDecoration(
+                            label: Text('description'.tr),
                             border: OutlineInputBorder()),
                       ),
                       Row(
@@ -61,19 +66,20 @@ class _TasksScreenState extends State<TasksScreen> {
                         children: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('cancel'),
+                            child: Text('cancel'.tr),
                           ),
                           ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 var task = Task(
                                     description: descriptionController.text,
                                     title: titleController.text,
                                     date: DateTime.now().toString(),
                                     id: Uuid().v1());
-                                context.read<HandleTasks>().addTask(task);
+                                print(context.read<HandleTasks>().items);
+                                await context.read<FirebaseService>().uploadTask(task);
                                 Navigator.pop(context);
                               },
-                              child: const Text('Add'))
+                              child: Text('add'.tr))
                         ],
                       ),
                     ],
@@ -93,6 +99,7 @@ class _TasksScreenState extends State<TasksScreen> {
   @override
   Widget build(BuildContext context) {
     final todoList = Provider.of<HandleTasks>(context).items;
+    final firebaseService = Provider.of<FirebaseService>(context);
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       floatingActionButton: FloatingActionButton(
@@ -119,9 +126,9 @@ class _TasksScreenState extends State<TasksScreen> {
                 const SizedBox(
                   width: 5,
                 ),
-                const Text(
-                  'Todo',
-                  style: TextStyle(
+                Text(
+                  'todo'.tr,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white70,
                     fontSize: 30,
@@ -129,14 +136,25 @@ class _TasksScreenState extends State<TasksScreen> {
                 ),
               ],
             ),
-            Center(
-              child: Chip(
-                label: Text(
-                  '${todoList.length} Pending',
-                ),
-              ),
-            ),
-            TaskList(taskList: todoList)
+            // Center(
+            //   child: Chip(
+            //     label: Text(
+            //       '${todoList.length} Pending',
+            //     ),
+            //   ),
+            // ),
+            ExpandedSection(child: TaskTile(task: Task(title: "hehe",id: "fjeif", description: "fowie", date: "2022-08-10 08:36:08.495568"))),
+            FutureBuilder(
+              future: firebaseService.fetchAllTasks(),
+              builder: (context, snapshot) {
+                if(snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if(snapshot.hasError) {
+                  return Center(child: Text('oh no'),);
+                }
+                return TaskList(taskList: firebaseService.tasks);
+              }
+            )
           ],
         ),
       ),

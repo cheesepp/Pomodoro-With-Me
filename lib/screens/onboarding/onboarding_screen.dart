@@ -10,31 +10,30 @@ import 'model/page_view_model.dart';
 
 class Onboarding {
   static SharedPreferences? _preferences;
-  final _isOnboardingKey = 'isOnboarding';
+  static const _isOnboardingKey = 'isOnboarding';
 
   static Future init() async {
     _preferences = await SharedPreferences.getInstance();
   }
 
-  setOnboardingData({bool check = false}) {
+  static setOnboardingData({bool check = false}) {
     _preferences!.setBool(_isOnboardingKey, check);
   }
 
-  bool? getOnboardingData() => _preferences!.getBool(_isOnboardingKey);
+  static bool? getOnboardingData() => _preferences!.getBool(_isOnboardingKey);
 }
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final onBoarding = Onboarding();
     return IntroductionScreen(
       globalBackgroundColor: Theme.of(context).primaryColor,
       pages: pages.map((page) => buildPageView(page)).toList(),
       onDone: () {
-        onBoarding.setOnboardingData();
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const AuthScreen()));
+        Onboarding.setOnboardingData();
+        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+            AuthScreen()), (Route<dynamic> route) => false);
       },
       showBackButton: true,
       back: const Icon(
