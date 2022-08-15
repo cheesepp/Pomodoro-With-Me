@@ -7,6 +7,7 @@ import 'package:pomodoro/services/firebase_services.dart';
 import 'package:pomodoro/services/storage_data.dart';
 import 'package:pomodoro/utils/ThemeColor.dart';
 import 'package:pomodoro/widgets/digital_clock.dart';
+import 'package:pomodoro/widgets/notification_dialog_widget.dart';
 import 'package:pomodoro/widgets/settings_drawer.dart';
 import 'package:pomodoro/widgets/video_player_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,11 +18,12 @@ import 'package:duration_picker/duration_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-// import 'package:assets_audio_player/assets_audio_player.dart';
+
 
 class ComponentDetailScreen extends StatefulWidget {
   static const routeName = 'component-detail';
   final CategoryComponent component;
+
   const ComponentDetailScreen({Key? key, required this.component})
       : super(key: key);
 
@@ -32,6 +34,7 @@ class ComponentDetailScreen extends StatefulWidget {
 class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     with TickerProviderStateMixin {
   GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+
   // final assetsAudioPlayer = AssetsAudioPlayer();
   double _setVolumeValue = 0;
   int rounds = 5;
@@ -40,6 +43,7 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
   Duration breakingDuration = const Duration(minutes: 5);
   Timer? learningTimer;
   Timer? breakingTimer;
+
   String twoDigits(int n) => n.toString().padLeft(2, '0');
   late AnimationController controller;
   bool isMuted = false;
@@ -70,11 +74,11 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     super.initState();
   }
 
-  void changeLearnDuration(bool isLearn) async {
+  void changeLearnDuration(bool isLearn, BuildContext context) async {
     _selectedDuration = await showDurationPicker(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(10)),
-          color: Color(0xffEDDFB3),
+          color: Theme.of(context).accentColor,
         ),
         context: context,
         initialTime: isLearn ? learningDuration : breakingDuration);
@@ -97,7 +101,7 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
         context: context,
         builder: (_) {
           return AlertDialog(
-            backgroundColor: const Color(0xffEDDFB3),
+            backgroundColor: Theme.of(context).accentColor,
             title: Text('choose_round'.tr),
             content: TextFormField(
               decoration: const InputDecoration(
@@ -147,8 +151,11 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
         // assetsAudioPlayer.play();
         isBreakingCompleted = !isBreakingCompleted;
         isLearningCompleted = !isLearningCompleted;
-        Future. delayed(Duration(seconds: 5), (){ startBreak(); });
-        showSnackBar(context, "Let's take some break! ☕", color: Theme.of(context).accentColor , textColor: Colors.black);
+        Future.delayed(Duration(seconds: 5), () {
+          startBreak();
+        });
+        showSnackBar(context, "Let's take some break! ☕",
+            color: Theme.of(context).accentColor, textColor: Colors.black);
         print('start');
         reset();
       } else {
@@ -165,10 +172,6 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
       print(seconds);
       if (seconds < 0) {
         breakingTimer?.cancel();
-        // assetsAudioPlayer.open(
-        //   Audio('assets/sounds/end_out.mp3'),
-        //   autoStart: true,
-        // );
         isPlaying = !isPlaying;
         isBreakingCompleted = !isBreakingCompleted;
         isLearningCompleted = !isLearningCompleted;
@@ -267,8 +270,8 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     return Scaffold(
       key: _scaffoldState,
       endDrawer: SettingDrawer(
-          learnDuration: () => changeLearnDuration(true),
-          breakDuration: () => changeLearnDuration(false),
+          learnDuration: () => changeLearnDuration(true, context),
+          breakDuration: () => changeLearnDuration(false, context),
           rounds: changeRounds),
       backgroundColor: Theme.of(context).primaryColor,
       body: SafeArea(
@@ -461,39 +464,18 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
                   const SizedBox(
                     width: 10,
                   ),
-                  // LikeButton(
-                  //   size: 60,
-                  //   isLiked: widget.component.isFavorite,
-                  //   likeBuilder: (bool isLiked) {
-                  //     return Icon(
-                  //       Icons.favorite,
-                  //       color: isLiked ? Colors.red : Colors.grey,
-                  //       size: 60,
-                  //     );
-                  //   },
-                  //   onTap: (value) async {
-                  //     bool isloading = true;
-                  //      widget.component.isFavorite = await !widget.component.isFavorite;
-                  //      if(isloading) {
-                  //        showSnackBar(context, "Loading...");
-                  //        await firebaseService.addFavorite(widget.component);
-                  //        print('ok');
-                  //        isloading = false;
-                  //      }
-                  //      return widget.component.isFavorite;
-                  //   },
-                  // ),
                   IconButton(
                     splashColor: Colors.transparent,
                     iconSize: 60,
                     onPressed: () async {
                       bool isloading = true;
-                      if(isloading) {
+                      if (isloading) {
                         await firebaseService.addFavorite(widget.component);
                         isloading = false;
                       }
-                      if(widget.component.isFavorite) showSnackBar(context, "fav_snack".tr, color: Color(0xffb22b27));
-
+                      if (widget.component.isFavorite)
+                        showSnackBar(context, "fav_snack".tr,
+                            color: Color(0xffb22b27));
                     },
                     icon: widget.component.isFavorite
                         ? const Icon(
@@ -525,25 +507,32 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
                   ),
                 ],
               ),
-              SizedBox(height: size.height*0.01,),
+              SizedBox(
+                height: size.height * 0.01,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("youtube".tr + ": ", style: TextStyle(color: Colors.white)),
-                  IconButton(onPressed: () async {
-                    print("comminh");
-                    final url = widget.component.ytbUrl;
-                    if(await canLaunchUrl(Uri.parse(url))) {
-                      await launchUrl(
-                          Uri.parse(url),
-                        mode: LaunchMode.externalApplication
-                          );
-                      print("hehe");
-                    }
-                  }, icon: Image.asset('assets/icons/youtube.png', color: Colors.white, width: 30, height: 20,)),
+                  Text("youtube".tr + ": ",
+                      style: TextStyle(color: Colors.white)),
+                  IconButton(
+                      onPressed: () async {
+                        print("comminh");
+                        final url = widget.component.ytbUrl;
+                        if (await canLaunchUrl(Uri.parse(url))) {
+                          await launchUrl(Uri.parse(url),
+                              mode: LaunchMode.externalApplication);
+                          print("hehe");
+                        }
+                      },
+                      icon: Image.asset(
+                        'assets/icons/youtube.png',
+                        color: Colors.white,
+                        width: 30,
+                        height: 20,
+                      )),
                 ],
               )
-
             ],
           ),
         ),

@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/src/provider.dart';
 
 import '../screens/auth_screen/auth_screen.dart';
+import '../widgets/notification_dialog_widget.dart';
 import '../widgets/toast_widget.dart';
 
 void showSnackBar(BuildContext context, String text,{ Color? color, Color? textColor} ) {
@@ -218,6 +219,7 @@ class AuthMethods extends ChangeNotifier {
       authNotifier.setUserDetails(users);
       SavingDataLocally.setLogin();
       SavingDataLocally.setAuthMethods('facebook auth');
+      NotificationDialog.show(context, 'Login success', 'Welcome! (*´▽`*)');
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: ((context) => const TabsScreen())));
 
@@ -231,6 +233,7 @@ class AuthMethods extends ChangeNotifier {
   Future facebookSignOut(AuthNotifier authNotifier, BuildContext context) async {
     await FacebookAuth.instance.logOut();
     SavingDataLocally.setLogin(isLogin: false);
+    NotificationDialog.show(context, 'Logout', 'Signout success!');
     Navigator.pushReplacement(context,
         MaterialPageRoute(builder: ((context) => const AuthScreen())));
     authNotifier.setUser(null);
@@ -273,6 +276,7 @@ class AuthMethods extends ChangeNotifier {
 
           authNotifier.setUserDetails(users);
           print('${authNotifier.userDetails.avatar}hehe');
+          NotificationDialog.show(context, 'Login success', 'Welcome! (*´▽`*)');
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: ((context) => const TabsScreen())));
           SavingDataLocally.setLogin();
@@ -288,6 +292,7 @@ class AuthMethods extends ChangeNotifier {
   Future googleSignOut(BuildContext context, AuthNotifier authNotifier) async {
     await FirebaseAuth.instance.signOut();
     SavingDataLocally.setLogin(isLogin: false);
+    NotificationDialog.show(context, 'Logout', 'Logout success');
     Navigator.pushReplacement(context,
         MaterialPageRoute(builder: ((context) => const AuthScreen())));
     authNotifier.setUser(null);

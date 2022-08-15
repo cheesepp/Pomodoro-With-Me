@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pomodoro/screens/favorite_screen.dart';
 import 'package:pomodoro/screens/homepage_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:pomodoro/screens/tasks_screen.dart';
-import 'package:pomodoro/screens/time_manager_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../utils/ThemeColor.dart';

@@ -6,6 +6,7 @@ const Map<String, String> vi = {
   'login_password': "Mật khẩu",
   'login_forgot': "Quên mật khẩu?",
   'login_login': "Đăng nhập!",
+  'log out': "Đăng xuất",
   'login_signup': "Đăng kí!",
   'add_image': 'Thêm ảnh',
   'username': "Tên người dùng",

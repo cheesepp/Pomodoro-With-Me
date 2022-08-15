@@ -134,13 +134,6 @@ class _TaskTileState extends State<TaskTile> {
                       ? (((ctx) => [
                             PopupMenuItem(
                                 child: TextButton.icon(
-                                    onPressed: () => _editTask(context),
-                                    icon: const Icon(Icons.edit),
-                                    label: const Text('Edit')),
-                                onTap: () => _editTask(context)),
-
-                            PopupMenuItem(
-                                child: TextButton.icon(
                                     onPressed: null,
                                     icon: const Icon(Icons.delete),
                                     label: const Text('Delete')),

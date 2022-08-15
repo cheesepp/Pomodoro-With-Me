@@ -12,7 +12,7 @@ class LanguageSection extends StatefulWidget {
   State<LanguageSection> createState() => _LanguageSectionState();
 }
 
-String currentLanguage = "en".tr;
+String currentLanguage = "vi".tr;
 
 class _LanguageSectionState extends State<LanguageSection> {
   @override

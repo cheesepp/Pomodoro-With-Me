@@ -25,7 +25,6 @@ import 'package:pomodoro/screens/homepage_screen.dart';
 import 'package:pomodoro/screens/onboarding/onboarding_screen.dart';
 import 'package:pomodoro/screens/tab_screen.dart';
 import 'package:pomodoro/screens/tasks_screen.dart';
-import 'package:pomodoro/screens/time_manager_screen.dart';
 import 'package:pomodoro/utils/ThemeColor.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -88,10 +87,6 @@ class MyApp extends StatelessWidget {
             builder: DevicePreview.appBuilder,
             debugShowCheckedModeBanner: false,
             title: 'Flutter Demo',
-            // theme: ThemeData(
-            //   fontFamily: 'DancingScript',
-            //
-            // ),
 
             theme: themeNotifier.getTheme(),
             initialRoute: '/',

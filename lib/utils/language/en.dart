@@ -8,6 +8,7 @@ const Map<String, String> en = {
   'login_password': "Password",
   'login_forgot': "Forgot password?",
   'login_login': "Sign in!",
+  'log out': "Log out",
   'login_signup': "Sign up!",
   'username': "User name",
   'add_image': "Add Image",

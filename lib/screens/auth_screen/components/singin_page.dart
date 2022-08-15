@@ -10,6 +10,7 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:provider/provider.dart';
 
 import '../../../providers/auth_notifier.dart';
+import '../../../widgets/notification_dialog_widget.dart';
 import '../../../widgets/toast_widget.dart';
 
 class SignInPage extends StatefulWidget {
@@ -59,6 +60,7 @@ class _SignInPageState extends State<SignInPage> {
       // login function
 
       _authentication.login(_users, authNotifier, context);
+      NotificationDialog.show(context, 'Login', 'Welcome! ＼(＾▽＾)／');
     }
   }
 
@@ -84,7 +86,7 @@ class _SignInPageState extends State<SignInPage> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ElevatedButton(
-                  child: const Text('Sign in!',
+                  child:  Text('login_login'.tr,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
