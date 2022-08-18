@@ -46,14 +46,15 @@ Change Laguage
 
 
 ## Splash Screen
-![Screenshot_2022-08-18-12-10-59-12_29a1cff320db92338fe782508d3d8c7a](https://user-images.githubusercontent.com/90992993/185351573-e5ccb210-f542-4897-97df-0f2678ab9ef1.jpg)
+<img width="200" src="screenshots/splash screen/splash.jpg"></a>
 
 
 
 ## Onboaring Screen
-![Screenshot_2022-08-18-12-11-01-53_29a1cff320db92338fe782508d3d8c7a](https://user-images.githubusercontent.com/90992993/185351723-8129f091-ce3a-48a9-be3c-cebc6c74c99e.jpg)
-![Screenshot_2022-08-18-12-11-05-27_29a1cff320db92338fe782508d3d8c7a](https://user-images.githubusercontent.com/90992993/185351808-b9b4365c-a089-4049-92ff-c7d82f4b75d2.jpg)
-![Screenshot_2022-08-18-12-11-07-18_29a1cff320db92338fe782508d3d8c7a](https://user-images.githubusercontent.com/90992993/185351857-b4703f11-b917-4a2f-9e4c-1825055ca298.jpg)
+
+<img width="200" src="screenshots/onboarding screen/onboard1.jpg"></a>
+<img width="200" src="screenshots/onboarding screen/onboard2.jpg"></a>
+<img width="200" src="screenshots/onboarding screen/onboard3.jpg"></a>
 
 ## Auth Screen
 ![Screenshot_2022-08-18-12-11-20-35_29a1cff320db92338fe782508d3d8c7a](https://user-images.githubusercontent.com/90992993/185351986-e790293b-e0de-4195-99e9-9735cb541907.jpg)
