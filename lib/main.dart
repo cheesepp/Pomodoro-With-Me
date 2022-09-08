@@ -79,7 +79,7 @@ class MyApp extends StatelessWidget {
                 return FirebaseService(items: items.items);
               }),
         ],
-        child: GetMaterialApp(
+        child: GetMaterialApp(  
             useInheritedMediaQuery: true,
             translations: I18nService(),
             locale: I18nService().locale,

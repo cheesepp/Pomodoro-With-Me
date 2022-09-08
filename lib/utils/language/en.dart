@@ -8,7 +8,7 @@ const Map<String, String> en = {
   'login_password': "Password",
   'login_forgot': "Forgot password?",
   'login_login': "Sign in!",
-  'log out': "Log out",
+  'log_out': "Log out",
   'login_signup': "Sign up!",
   'username': "User name",
   'add_image': "Add Image",
@@ -24,11 +24,11 @@ const Map<String, String> en = {
   "cancel": "Cancel",
   "choose_round": "Choose your rounds",
 
-  "youtube" : "Youtube channel",
+  "youtube": "Youtube channel",
   "fav_snack": "This video has been added into your favorites list! (b ᵔ▽ᵔ)b",
 
   // Home Screen
-  "category" : "Categories",
+  "category": "Categories",
   "code": "Code",
   "space": "Space",
   "lofi": "Lofi",
@@ -36,7 +36,7 @@ const Map<String, String> en = {
   "city": "City",
   "beach": "Beach",
   "window": "Window",
-  "cafe" : "cafe",
+  "cafe": "cafe",
 
   // Favorite Screen
   "favorites": "Favorites",
@@ -47,7 +47,6 @@ const Map<String, String> en = {
   "add": "Add",
   "todo": "Todo",
   "add_task": "Add Task",
-
 
   // Product cart tile
   "cart_amount": "Amount",

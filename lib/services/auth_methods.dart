@@ -17,10 +17,14 @@ import '../screens/auth_screen/auth_screen.dart';
 import '../widgets/notification_dialog_widget.dart';
 import '../widgets/toast_widget.dart';
 
-void showSnackBar(BuildContext context, String text,{ Color? color, Color? textColor} ) {
+void showSnackBar(BuildContext context, String text,
+    {Color? color, Color? textColor}) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(text, style: TextStyle(color: textColor),),
+      content: Text(
+        text,
+        style: TextStyle(color: textColor),
+      ),
       backgroundColor: color,
     ),
   );
@@ -28,7 +32,7 @@ void showSnackBar(BuildContext context, String text,{ Color? color, Color? textC
 
 class AuthMethods extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  final FirebaseFirestore ref = FirebaseFirestore.instance;
   //login
   Future<void> login(
       Users users, AuthNotifier authNotifier, BuildContext context) async {
@@ -38,13 +42,14 @@ class AuthMethods extends ChangeNotifier {
       result = await _auth.signInWithEmailAndPassword(
           email: users.email, password: users.password);
     } catch (e) {
-      toast('Sai roi ba');
+      toast('Your email or password is not correctly!');
     }
 
     //check verification
     try {
       if (result != null) {
         User user = _auth.currentUser!;
+        _auth.currentUser == null ? print('null') : print('not null');
         if (!user.emailVerified) {
           _auth.signOut();
           toast('Email ID not verified');
@@ -85,7 +90,7 @@ class AuthMethods extends ChangeNotifier {
         await user.sendEmailVerification();
         if (user != null) {
           await user.reload();
-          uploadUserData(users, userDataUploaded);
+          await uploadUserData(users, userDataUploaded);
           await _auth.signOut();
           authNotifier.setUser(null);
 
@@ -123,11 +128,12 @@ class AuthMethods extends ChangeNotifier {
     users.avatar = await FirebaseStorage.instance
         .ref()
         .child('user_image')
-        .child(currentUser.uid.toString() + '.jpg').getDownloadURL();
+        .child(currentUser.uid.toString() + '.jpg')
+        .getDownloadURL();
 
     users.uuid = currentUser.uid;
     CollectionReference userRef =
-    FirebaseFirestore.instance.collection('users');
+        FirebaseFirestore.instance.collection('users');
 
     // check data uploaded or not
     if (!userDataUploadVar) {
@@ -135,11 +141,11 @@ class AuthMethods extends ChangeNotifier {
           .doc(currentUser.uid)
           .set(users.toJson())
           .catchError((e) => print('errorrrrr'
-          ': ' + e))
+                  ': ' +
+              e))
           .then((value) {
-            print(users.toJson());
-            userDataUploadVar = true;
-
+        print(users.toJson());
+        userDataUploadVar = true;
       });
     }
   }
@@ -189,10 +195,6 @@ class AuthMethods extends ChangeNotifier {
 
   // STATE PERSISTENCE STREAM
   Stream<User?> get authState => FirebaseAuth.instance.authStateChanges();
-  // OTHER WAYS (depends on use case):
-  // Stream get authState => FirebaseAuth.instance.userChanges();
-  // Stream get authState => FirebaseAuth.instance.idTokenChanges();
-  // KNOW MORE ABOUT THEM HERE: https://firebase.flutter.dev/docs/auth/start#auth-state
   // FACEBOOK SIGN IN
   Future<void> signInWithFacebook(
       BuildContext context, AuthNotifier authNotifier) async {
@@ -207,8 +209,8 @@ class AuthMethods extends ChangeNotifier {
       bool userDataUploaded = false;
       User currentUser = fbuser.user!;
       users.userName = currentUser.displayName ?? "No information";
-      users.avatar = currentUser.photoURL ??
-          "https://demofree.sirv.com/nope-not-here.jpg";
+      users.avatar =
+          currentUser.photoURL ?? "https://demofree.sirv.com/nope-not-here.jpg";
       users.email = currentUser.email!;
       users.uuid = currentUser.uid;
 
@@ -222,7 +224,6 @@ class AuthMethods extends ChangeNotifier {
       NotificationDialog.show(context, 'Login success', 'Welcome! (*´▽`*)');
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: ((context) => const TabsScreen())));
-
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
       print(e.message!); // Displaying the error message
@@ -230,14 +231,16 @@ class AuthMethods extends ChangeNotifier {
   }
 
   // FACEBOOK SIGN OUT
-  Future facebookSignOut(AuthNotifier authNotifier, BuildContext context) async {
+  Future facebookSignOut(
+      AuthNotifier authNotifier, BuildContext context) async {
     await FacebookAuth.instance.logOut();
     SavingDataLocally.setLogin(isLogin: false);
     NotificationDialog.show(context, 'Logout', 'Signout success!');
-    Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: ((context) => const AuthScreen())));
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: ((context) => const AuthScreen())));
     authNotifier.setUser(null);
-    authNotifier.setUserDetails(Users(userName: '', email: '', password: '', avatar: '', uuid: ''));
+    authNotifier.setUserDetails(
+        Users(userName: '', email: '', password: '', avatar: '', uuid: ''));
   }
 
   // GOOGLE SIGN IN
@@ -293,10 +296,10 @@ class AuthMethods extends ChangeNotifier {
     await FirebaseAuth.instance.signOut();
     SavingDataLocally.setLogin(isLogin: false);
     NotificationDialog.show(context, 'Logout', 'Logout success');
-    Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: ((context) => const AuthScreen())));
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: ((context) => const AuthScreen())));
     authNotifier.setUser(null);
-    authNotifier.setUserDetails(Users(userName: '', email: '', password: '', avatar: '', uuid: ''));
+    authNotifier.setUserDetails(
+        Users(userName: '', email: '', password: '', avatar: '', uuid: ''));
   }
-
 }

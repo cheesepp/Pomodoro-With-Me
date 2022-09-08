@@ -6,7 +6,7 @@ const Map<String, String> vi = {
   'login_password': "Mật khẩu",
   'login_forgot': "Quên mật khẩu?",
   'login_login': "Đăng nhập!",
-  'log out': "Đăng xuất",
+  'log_out': "Đăng xuất",
   'login_signup': "Đăng kí!",
   'add_image': 'Thêm ảnh',
   'username': "Tên người dùng",
@@ -22,11 +22,11 @@ const Map<String, String> vi = {
   "cancel": "Hủy",
   "choose_round": "Chọn số vòng bạn học",
 
-  "youtube" : "Kênh youtube",
+  "youtube": "Kênh youtube",
   "fav_snack": "Đã thêm video vào danh sách yêu thích của bạn (b ᵔ▽ᵔ)b",
 
   // Home Screen
-  "category" : "Thể loại",
+  "category": "Thể loại",
   "code": "Code",
   "space": "Vũ trụ",
   "lofi": "Lofi",
@@ -34,7 +34,7 @@ const Map<String, String> vi = {
   "city": "Thành phố",
   "beach": "Biển",
   "window": "Khung cửa sổ",
-  "cafe" : "cafe",
+  "cafe": "cafe",
 
   // Favorite Screen
   "favorites": "Yêu thích",

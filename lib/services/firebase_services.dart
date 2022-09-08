@@ -24,7 +24,8 @@ class FirebaseService extends ChangeNotifier {
           .get();
       if (favoritesRef.docs.isNotEmpty) {
         favoritesRef.docs.forEach((element) {
-          favorites.add(items.firstWhere((item) => item.id == element.data()['id']));
+          favorites
+              .add(items.firstWhere((item) => item.id == element.data()['id']));
         });
       } else {
         favorites = {};
@@ -76,21 +77,24 @@ class FirebaseService extends ChangeNotifier {
   }
 
   Future updateTask(Task task) async {
-
     await firestore
         .collection("users")
         .doc(user.uid)
         .collection("tasks")
-        .doc(task.id).update(task.toJson());
+        .doc(task.id)
+        .update(task.toJson());
     notifyListeners();
   }
 
   Future removeTask(Task task) async {
-
-    await firestore.collection("users").doc(user.uid).collection("tasks").doc(task.id).delete();
-   tasks.removeWhere((element) => element.id == task.id);
+    await firestore
+        .collection("users")
+        .doc(user.uid)
+        .collection("tasks")
+        .doc(task.id)
+        .delete();
+    tasks.removeWhere((element) => element.id == task.id);
     notifyListeners();
-
   }
 
   Future<void> fetchAllTasks() async {
@@ -105,15 +109,14 @@ class FirebaseService extends ChangeNotifier {
           .get();
       taskRef.docs.forEach((element) {
         tasks.add(Task.fromJson(element.data()));
-        for (int i = 0;i < tasks.length - 1;i++){
-          for (int j = i+1;j < tasks.length;j++){
+        for (int i = 0; i < tasks.length - 1; i++) {
+          for (int j = i + 1; j < tasks.length; j++) {
             if (tasks.elementAt(i).id == tasks.elementAt(j).id) {
               tasks.remove(tasks.elementAt(j));
             }
           }
         }
       });
-
     } catch (e) {
       print(e);
     }

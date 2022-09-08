@@ -60,6 +60,7 @@ class _SignInPageState extends State<SignInPage> {
       // login function
 
       _authentication.login(_users, authNotifier, context);
+      print('name: ' + authNotifier.userDetails.userName);
       NotificationDialog.show(context, 'Login', 'Welcome! ＼(＾▽＾)／');
     }
   }
@@ -86,7 +87,7 @@ class _SignInPageState extends State<SignInPage> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ElevatedButton(
-                  child:  Text('login_login'.tr,
+                  child: Text('login_login'.tr,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(

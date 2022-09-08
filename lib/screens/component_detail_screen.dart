@@ -19,6 +19,9 @@ import 'package:just_audio/just_audio.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import 'components_detail_screen.dart/tomato_rounds.dart';
+import 'components_detail_screen.dart/widgets/detail_header.dart';
+import 'components_detail_screen.dart/widgets/label_video.dart';
 
 class ComponentDetailScreen extends StatefulWidget {
   static const routeName = 'component-detail';
@@ -35,7 +38,6 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     with TickerProviderStateMixin {
   GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
-  // final assetsAudioPlayer = AssetsAudioPlayer();
   double _setVolumeValue = 0;
   int rounds = 5;
   int initRounds = 5;
@@ -85,11 +87,9 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
     if (_selectedDuration != null) {
       if (isLearn) {
         learningDuration = _selectedDuration as Duration;
-        print("learning = $_selectedDuration");
         SavingDataLocally.setLearningDuration(_selectedDuration!.inMinutes);
       } else {
         breakingDuration = _selectedDuration as Duration;
-        print("breaking = $_selectedDuration");
         SavingDataLocally.setBreakingDuration(_selectedDuration!.inMinutes);
       }
       setState(() {});
@@ -278,52 +278,11 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                margin: const EdgeInsets.only(top: 20, left: 30),
-                child: Row(
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white70,
-                        )),
-                    Expanded(
-                      child: Container(),
-                    ),
-                    const DigitalClockBuilder(),
-                    IconButton(
-                        onPressed: () {
-                          _scaffoldState.currentState!.openEndDrawer();
-                        },
-                        icon: const Icon(
-                          Icons.settings,
-                          color: Colors.white70,
-                        )),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                  ],
-                ),
-              ),
+              DetailHeader(scaffoldState: _scaffoldState),
               const SizedBox(
                 height: 40,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                    rounds,
-                    (index) => Padding(
-                          padding: const EdgeInsets.all(3),
-                          child: Image.asset(
-                            'assets/icons/tomatoDone.png',
-                            width: 20,
-                            height: 20,
-                          ),
-                        )),
-              ),
+              TomatoRounds(rounds: rounds),
               const SizedBox(
                 height: 20,
               ),
@@ -349,15 +308,7 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
               const SizedBox(
                 height: 50,
               ),
-              Text(
-                widget.component.name,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70,
-                  fontSize: 25,
-                ),
-              ),
+              LabelVideo(widget: widget),
               const SizedBox(
                 height: 50,
               ),
@@ -517,12 +468,11 @@ class _ComponentDetailScreenState extends State<ComponentDetailScreen>
                       style: TextStyle(color: Colors.white)),
                   IconButton(
                       onPressed: () async {
-                        print("comminh");
                         final url = widget.component.ytbUrl;
                         if (await canLaunchUrl(Uri.parse(url))) {
-                          await launchUrl(Uri.parse(url),
-                              mode: LaunchMode.externalApplication);
-                          print("hehe");
+                          await launchUrl(
+                            Uri.parse(url),
+                          );
                         }
                       },
                       icon: Image.asset(

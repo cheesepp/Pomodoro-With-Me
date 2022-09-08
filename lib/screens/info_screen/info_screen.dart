@@ -55,20 +55,25 @@ class _InfoScreenState extends State<InfoScreen> {
             padding: const EdgeInsets.all(15),
             child: Column(
               children: [
-                SizedBox(height: size.height*0.1,),
-                 SizedBox(
-                   width: size.width*0.3,
-                   child: ClipRRect(
-                      borderRadius: BorderRadius.circular(50),
-                      child: Image.network(
-                        authNotifier.userDetails.avatar,
-                        fit: BoxFit.contain,
-                      ),
+                SizedBox(
+                  height: size.height * 0.1,
+                ),
+                SizedBox(
+                  width: size.width * 0.3,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.network(
+                      authNotifier.userDetails.avatar,
+                      fit: BoxFit.contain,
                     ),
-                 ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 30, bottom: 30),
-                  child: Text(authNotifier.userDetails.userName, style: const TextStyle(fontSize: 25),),
+                  child: Text(
+                    authNotifier.userDetails.userName,
+                    style: const TextStyle(fontSize: 25),
+                  ),
                 ),
                 ExpansionTile(
                     backgroundColor: Theme.of(context).accentColor,
@@ -108,14 +113,14 @@ class _InfoScreenState extends State<InfoScreen> {
                         ),
                       ),
                     ]),
-
-                LanguageSection(lang: _language, onClick: _handleChangeLanguage),
+                LanguageSection(
+                    lang: _language, onClick: _handleChangeLanguage),
                 Padding(
                   padding: const EdgeInsets.only(top: 30.0),
                   child: ElevatedButton(
-                    child: const Text('Log out!',
-                        style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: Text('log_out'.tr + '!',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
@@ -125,19 +130,19 @@ class _InfoScreenState extends State<InfoScreen> {
                         fixedSize: const Size(150,
                             40)), //El ancho de deja en 0 porque el "expanded" lo define.
                     onPressed: () async {
-                      String logoutType =
-                      SavingDataLocally.getAuthMethods();
+                      String logoutType = SavingDataLocally.getAuthMethods();
                       switch (logoutType) {
                         case 'facebook auth':
-                          await authMethods.facebookSignOut(authNotifier, context);
+                          await authMethods.facebookSignOut(
+                              authNotifier, context);
                           break;
                         case 'google auth':
-                          await authMethods.googleSignOut(context, authNotifier);
+                          await authMethods.googleSignOut(
+                              context, authNotifier);
                           print('ok');
                           break;
                         default:
-                          await authMethods
-                              .signOut(authNotifier, context);
+                          await authMethods.signOut(authNotifier, context);
                       }
                     },
                   ),
